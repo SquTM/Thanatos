@@ -1,15 +1,17 @@
-﻿using Discord;
+﻿namespace Thanatos;
+
+using Discord;
 using Discord.WebSocket;
 using DotNetEnv;
 
 class Program
 {
-    private DiscordSocketClient _client;
+    private DiscordSocketClient _client = new();
 
-    static async Task Main(string[] args)
+    static async Task Main()
         => await new Program().RunBotAsync();
 
-    public async Task RunBotAsync()
+    private async Task RunBotAsync()
     {
         Env.Load();
         string token = Environment.GetEnvironmentVariable("DISCORD_TOKEN")!;
