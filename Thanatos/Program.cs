@@ -6,7 +6,7 @@ using DotNetEnv;
 
 class Program
 {
-    private DiscordSocketClient _client = new();
+    private DiscordSocketClient? _client;
 
     static async Task Main()
         => await new Program().RunBotAsync();
@@ -14,7 +14,12 @@ class Program
     private async Task RunBotAsync()
     {
         Env.Load();
-        string token = Environment.GetEnvironmentVariable("DISCORD_TOKEN")!;
+        var token = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            Console.Error.WriteLine("DISCORD_TOKEN is not set. Create a .env file with DISCORD_TOKEN=<your token>.");
+            return;
+        }
 
         _client = new DiscordSocketClient();
         _client.Log += LogAsync;
@@ -28,13 +33,16 @@ class Program
 
     private Task LogAsync(LogMessage log)
     {
-        Console.WriteLine(log);
+        Console.WriteLine(log.ToString());
         return Task.CompletedTask;
     }
 
     private async Task MessageReceivedAsync(SocketMessage message)
     {
+        if (message.Author.IsBot) return;
         if (message.Content == "!ping")
+        {
             await message.Channel.SendMessageAsync("Pong!");
+        }
     }
 }
